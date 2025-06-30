@@ -2,6 +2,14 @@
 
 Compares the handling of dangling references between federated services using both Cosmo and Apollo.
 
+To run:
+```shell
+pnpm install
+pnpm build
+pnpm start
+pnpm test
+```
+
 The identity service resolves a simple user type. The order service resolves an order type that has the id of user associated with the order. In the order schema, it defines an unresolvable type for `User` containing only the id property.
 
 ```graphl
