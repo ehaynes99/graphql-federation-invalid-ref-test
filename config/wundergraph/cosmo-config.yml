@@ -1,0 +1,6 @@
+version: '1'
+execution_config:
+  file:
+    path: /app/supergraph.json
+    watch: true
+log_level: info

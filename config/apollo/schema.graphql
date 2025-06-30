@@ -1,0 +1,68 @@
+schema
+  @link(url: "https://specs.apollo.dev/link/v1.0")
+  @link(url: "https://specs.apollo.dev/join/v0.3", for: EXECUTION)
+{
+  query: Query
+}
+
+directive @join__enumValue(graph: join__Graph!) repeatable on ENUM_VALUE
+
+directive @join__field(graph: join__Graph, requires: join__FieldSet, provides: join__FieldSet, type: String, external: Boolean, override: String, usedOverridden: Boolean) repeatable on FIELD_DEFINITION | INPUT_FIELD_DEFINITION
+
+directive @join__graph(name: String!, url: String!) on ENUM_VALUE
+
+directive @join__implements(graph: join__Graph!, interface: String!) repeatable on OBJECT | INTERFACE
+
+directive @join__type(graph: join__Graph!, key: join__FieldSet, extension: Boolean! = false, resolvable: Boolean! = true, isInterfaceObject: Boolean! = false) repeatable on OBJECT | INTERFACE | UNION | ENUM | INPUT_OBJECT | SCALAR
+
+directive @join__unionMember(graph: join__Graph!, member: String!) repeatable on UNION
+
+directive @link(url: String, as: String, for: link__Purpose, import: [link__Import]) repeatable on SCHEMA
+
+scalar join__FieldSet
+
+enum join__Graph {
+  IDENTITY @join__graph(name: "identity", url: "http://identity-server:4110/graphql")
+  ORDERS @join__graph(name: "orders", url: "http://order-server:4111/graphql")
+}
+
+scalar link__Import
+
+enum link__Purpose {
+  """
+  `SECURITY` features provide metadata necessary to securely resolve fields.
+  """
+  SECURITY
+
+  """
+  `EXECUTION` features provide metadata necessary for operation execution.
+  """
+  EXECUTION
+}
+
+type Order
+  @join__type(graph: ORDERS, key: "id")
+{
+  id: ID!
+  user: User
+  numItems: Int!
+}
+
+type Query
+  @join__type(graph: IDENTITY)
+  @join__type(graph: ORDERS)
+{
+  user(id: String!): User @join__field(graph: IDENTITY)
+  order(id: String!): Order @join__field(graph: ORDERS)
+  orders: [Order!]! @join__field(graph: ORDERS)
+}
+
+type User
+  @join__type(graph: IDENTITY, key: "id")
+  @join__type(graph: ORDERS, key: "id", resolvable: false)
+{
+  id: ID!
+  email: String! @join__field(graph: IDENTITY)
+  firstName: String! @join__field(graph: IDENTITY)
+  lastName: String! @join__field(graph: IDENTITY)
+}

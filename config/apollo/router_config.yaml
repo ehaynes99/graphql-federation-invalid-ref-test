@@ -1,0 +1,11 @@
+supergraph:
+  introspection: true
+  listen: 0.0.0.0:4000
+  path: /graphql
+
+health_check:
+  enabled: true
+  path: /health
+
+plugins:
+  experimental.expose_query_plan: true

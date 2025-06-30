@@ -1,0 +1,17 @@
+extend schema @link(url: "https://specs.apollo.dev/federation/v2.5", import: ["@key", "@external"])
+
+# provided by the identity server
+type User @key(fields: "id", resolvable: false) {
+  id: ID!
+}
+
+type Order @key(fields: "id") {
+  id: ID!
+  user: User
+  numItems: Int!
+}
+
+type Query {
+  order(id: String!): Order
+  orders: [Order!]!
+}

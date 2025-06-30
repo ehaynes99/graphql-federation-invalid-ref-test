@@ -13,24 +13,36 @@
     "src"
   ],
   "scripts": {
-    "build": "tsc -b tsconfig.build.json",
+    "build": "pnpm build:server && pnpm build:supergraph && pnpm build:apollo",
+    "build:apollo": "node config/apollo/compose-supergraph.js",
+    "build:server": "tsc -b",
+    "build:supergraph": "rm -f ./config/wundergraph/supergraph.json && wgc router compose -i config/wundergraph/supergraph.yml -o config/wundergraph/supergraph.json",
     "clean": "rm -rf ./dist",
     "format": "npm run lint -- --fix",
     "lint": "eslint --cache .",
+    "restart": "docker compose restart",
+    "start": "docker compose up -d",
+    "stop": "docker compose stop",
     "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },
+  "dependencies": {
+    "@apollo/composition": "^2.11.2",
+    "@apollo/subgraph": "^2.11.2",
+    "@graphql-tools/load-files": "^7.0.1",
+    "@graphql-tools/merge": "^9.0.24",
+    "graphql": "^16.11.0",
+    "graphql-yoga": "^5.13.5"
+  },
   "devDependencies": {
-    "@swc/core": "^1.12.7",
-    "@swc/jest": "^0.2.38",
-    "@types/jest": "^30.0.0",
-    "@types/node": "^24.0.6",
+    "@types/node": "^22.15.34",
     "@vitest/coverage-v8": "^3.2.4",
     "eslint": "^9.30.0",
     "eslint-config-erich": "4.0.0",
     "tsx": "^4.20.3",
     "typescript": "^5.8.3",
-    "vitest": "^3.2.4"
+    "vitest": "^3.2.4",
+    "wgc": "^0.85.2"
   },
   "engines": {
     "node": ">=22",

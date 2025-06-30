@@ -1,0 +1,63 @@
+services:
+  wundergraph-router:
+    image: ghcr.io/wundergraph/cosmo/router:latest
+    container_name: wundergraph-router
+    ports:
+      - '4101:4000'
+    environment:
+      - ROUTER_CONFIG_PATH=/app/supergraph.json
+      - CONFIG_PATH=/app/config.yml
+      - DEV_MODE=true
+      - LISTEN_ADDR=0.0.0.0:4000
+    volumes:
+      - ./config/wundergraph/supergraph.json:/app/supergraph.json:ro
+      - ./config/wundergraph/cosmo-config.yml:/app/config.yml:ro
+    networks:
+      - federation-test
+
+  apollo-router:
+    image: ghcr.io/apollographql/apollo-runtime:latest
+    container_name: apollo-router
+    ports:
+      - '4100:4000'
+    environment:
+      - APOLLO_ROUTER_CONFIG_PATH=/config/router.yaml
+      - APOLLO_ROUTER_SUPERGRAPH_PATH=/config/supergraph.graphql
+    volumes:
+      - ./config/apollo:/config
+    networks:
+      - federation-test
+
+  identity-server:
+    image: node:20-alpine
+    container_name: identity-server
+    working_dir: /app
+    ports:
+      - '4110:4110'
+    volumes:
+      - .:/app
+    command: npx tsx src/identity-service/identity-server.ts
+    networks:
+      - federation-test
+    depends_on:
+      - wundergraph-router
+      - apollo-router
+
+  order-server:
+    image: node:20-alpine
+    container_name: order-server
+    working_dir: /app
+    ports:
+      - '4111:4111'
+    volumes:
+      - .:/app
+    command: npx tsx src/order-service/order-server.ts
+    networks:
+      - federation-test
+    depends_on:
+      - wundergraph-router
+      - apollo-router
+
+networks:
+  federation-test:
+    driver: bridge
